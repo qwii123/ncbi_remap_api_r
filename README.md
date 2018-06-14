@@ -1,2 +1,2 @@
-# ncbi_remap_api_r
+# Rscript clone for NCBI remap API
 R script for accessing NCBI remap API
