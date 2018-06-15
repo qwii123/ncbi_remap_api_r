@@ -4,27 +4,27 @@ main = function(mode="batches",from_acc="GCF_000001405.13",dest_acc="GCF_0000014
   require(jsonlite)
   require(rvest)
   
+  # Variables ----
+  URLbase <<- "https://www.ncbi.nlm.nih.gov:443/projects/genome/tools/remap/"
+  RemapServiceCgi <<- "remapservice.cgi"
+  RemapInfoCgi <<- "remapinfo.cgi"
+
+  URLcheck <<- "https://www.ncbi.nlm.nih.gov/genome/tools/remap/"
+  
+  annot_file_name <<- file.path(file.dir,annot_file)
+  
+  batch_id <<- GetAsmBatchId(from_acc,dest_acc)
+
   # Default batches ----
   if(mode == "batches"){
     return(PrintBatches())
   }
   
-  # Variables ----
-  URLbase = "https://www.ncbi.nlm.nih.gov:443/projects/genome/tools/remap/"
-  RemapServiceCgi = "remapservice.cgi"
-  RemapInfoCgi = "remapinfo.cgi"
-
-  URLcheck = "https://www.ncbi.nlm.nih.gov/genome/tools/remap/"
-  
-  annot_file_name=file.path(file.dir,annot_file)
-  
-  batch_id = GetAsmBatchId(from_acc,dest_acc)
-  
-  MainSubmission(mode,batch_id,from_acc,dest_acc,annot_file_name,file.dir,min_cov,max_exp,allow_dupes,merge,in_format,out_format,verbose)
+  MainSubmission(mode,batch_id,from_acc,dest_acc,annot_file_name,file.dir,min_cov,max_exp,allow_dupes,merge,in_format,out_format,verbose,annot_file)
   
 }
 
-MainSubmission = function(mode,batch_id,acc_one,acc_two,annot_file_name,file.dir,min_cov,max_exp,allow_dupes,merge,in_format,out_format,verbose){
+MainSubmission = function(mode,batch_id,acc_one,acc_two,annot_file_name,file.dir,min_cov,max_exp,allow_dupes,merge,in_format,out_format,verbose,annot_file){
   from_arg = "source-assembly"
   dest_arg = "target-assembly"
   
@@ -43,10 +43,11 @@ MainSubmission = function(mode,batch_id,acc_one,acc_two,annot_file_name,file.dir
   JSID = strsplit(request[["url"]],split="/")[[1]][4]
   check.URL = paste0(URLcheck,JSID)
   check.request = httr::GET(paste0(URLcheck,JSID))
+  message(paste0("Checking results at ",check.URL))
   if(!(status_code(check.request)==200)){
     stop("Error: Check your parameters.")
   }
-  download.list = RecheckSubmission(check.URL)
+  download.list = RecheckSubmission(check.URL,annot_file)
   
   download.file(url=download.list[3],destfile=file.path(file.dir,paste0("remapped_annot_",annot_file)))
   download.file(url=download.list[2],destfile=file.path(file.dir,paste0("remapped_report_",annot_file)))
@@ -54,7 +55,7 @@ MainSubmission = function(mode,batch_id,acc_one,acc_two,annot_file_name,file.dir
   
 }
 
-RecheckSubmission = function(check.URL){
+RecheckSubmission = function(check.URL,annot_file){
   repeat{
     xml.doc = read_html(check.URL)
     xml.title = xml.doc %>% html_nodes("title") %>% html_text()
