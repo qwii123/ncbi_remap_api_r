@@ -13,6 +13,6 @@ You would need to call the [main] function with variables manually set. If done 
 And, again with limited functionality, the R script should return two different files automatically (remapped report and annotation file). Again, I would need to clean up ways to output files.
 
 ## To-do
-- Pretty main function to execute with
-- Ways of outputting the file
+- Pretty main function to execute with [done]
+- Ways of outputting the file [done]
 - Functionality that were lost in translation
