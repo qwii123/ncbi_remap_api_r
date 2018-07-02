@@ -118,7 +118,7 @@ RecheckSubmission = function(check.URL){
       elapsed = gsub("\n","",elapsed)
       elapsed = gsub("\t","",elapsed)
       elapsed = gsub("   "," ",elapsed)
-      message(paste0(elapsed,"\nRefreshing..."))
+      message(paste0(elapsed,"\tRefreshing..."))
       Sys.sleep(3)
     }
   }
